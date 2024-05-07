@@ -22,5 +22,5 @@ model User {
   role String
   createdAt DateTime @default(now())
 
-  @@map("user")
+  @@map("users")
 }

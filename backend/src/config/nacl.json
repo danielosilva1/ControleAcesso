@@ -13,7 +13,7 @@
         "group": "auth",
         "permissions": [
                         {
-                            "recource": "auth/*",
+                            "resource": "auth/*",
                             "methods": [ "POST", "GET",  "PUT"],
                             "action": "allow"
                         }
