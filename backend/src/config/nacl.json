@@ -14,7 +14,7 @@
         "permissions": [
                         {
                             "resource": "auth/*",
-                            "methods": [ "POST", "GET",  "PUT"],
+                            "methods": [ "POST", "GET",  "PUT", "DELETE"],
                             "action": "allow"
                         }
                        ]

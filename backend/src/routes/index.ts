@@ -23,12 +23,14 @@ routes.use(acl.authorize);
 
 /* Rotas que requerem autorização, somente */
 routes.get('/auth/get-logged-user', new GetLoggedUserController().handle);
+routes.put('/auth/update-user', new UpdateUserController().handle);
+routes.delete('/auth/delete-user', new DeleteUserController().handle);
 
 /* Rotas que requerem permissão de administrador */
 routes.post('/admin/create-user', new CreateUserController().handle);
 routes.get('/admin/get-user-by-id/:id', new GetUserByIdController().handle);
 routes.get('/admin/get-user-by-username/:username', new GetUserByUsernameController().handle);
 routes.put('/admin/update-user/:id?', new UpdateUserController().handle);
-routes.delete('/admin/dalete-user/:id?', new DeleteUserController().handle);
+routes.delete('/admin/delete-user/:id?', new DeleteUserController().handle);
 
 export { routes };

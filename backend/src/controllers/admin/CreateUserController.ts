@@ -23,6 +23,15 @@ class CreateUserController {
                 return res.status(400).json({error: "User already exist"});
             }
 
+            // Valida email: deve ser único
+            const emailAlreadyExists = await db.user.findFirst({
+                where: { email } // Verifica se há outro usuário com mesmo email
+            });
+            
+            if (emailAlreadyExists) {
+                return res.status(400).json({message: "Already exists user with same email"})
+            }
+
             // Criptogra a senha do usuário usando hash code
             const salt = await bcrypt.genSalt(10);
             const hashedPass = await bcrypt.hash(password, salt);

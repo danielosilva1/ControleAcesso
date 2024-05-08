@@ -5,8 +5,6 @@ class GetUserByIdController {
     async handle(req: Request | any, res: Response) {
         let id = req.params.id;
 
-        console.log(id);
-
         if (!id) {
             return res.status(400).json({message: "Id of searched user is required as a requisition parameter"})
         }

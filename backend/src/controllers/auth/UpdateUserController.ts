@@ -57,7 +57,7 @@ class UpdateUserController {
                 data: {
                     fullname,
                     email,
-                    password: password == undefined ? hashedPass : user.password,
+                    password: password == undefined ? user.password : hashedPass,
                     role
                 }
             });
