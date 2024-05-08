@@ -12,7 +12,7 @@ class SignUpController {
                 return res.status(400).json({message: "Fullname, email, username and password are required fields"});
             }
 
-            // Criptogra a senha do usuário usando hash code
+            // Criptografa a senha do usuário usando hash code
             const salt = await bcrypt.genSalt(10);
             const hashedPass = await bcrypt.hash(password, salt);
 

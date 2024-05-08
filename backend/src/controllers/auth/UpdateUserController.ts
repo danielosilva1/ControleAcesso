@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { db } from '../../db';
 import bcrypt from 'bcrypt';
+import { Prisma } from '@prisma/client';
 
 /* Atualização pode ser:
    1. Do usuário logado;
@@ -36,15 +37,6 @@ class UpdateUserController {
                 role = 'auth'
             }
 
-            // Valida email: deve ser único
-            const emailAlreadyExists = await db.user.findFirst({
-                where: { id: { not: Number(id) }, email } // Verifica se há outro usuário com mesmo email
-            });
-            
-            if (emailAlreadyExists) {
-                return res.status(400).json({message: "Already exists user with same email"})
-            }
-
             // Criptografa senha, caso ela vá ser alterada
             let hashedPass;
             if (password) {
@@ -64,6 +56,16 @@ class UpdateUserController {
 
             return res.status(200).json({user: updatedUser});
         } catch (error) {
+            /* Erro que pode ocorrer:
+               1. Restrição de chave única no email
+            */
+            if (error instanceof Prisma.PrismaClientKnownRequestError) {
+                if (error.code === 'P2002') {
+                    // "P2002: Unique constraint failed on the {constraint}"
+                    return res.status(400).json({message: "Already exists user with same email"})
+                }
+            }
+
             console.error(error);
             throw(error);
         }
