@@ -5,10 +5,10 @@ import bcrypt from 'bcrypt';
 class CreateUserController {
     async handle(req: Request, res: Response) {
         try {
-            let {fullname, email, username, password} = req.body;
+            let { fullname, email, username, password, role } = req.body;
 
-            if (!(fullname && email && username && password)) {
-                return res.status(400).json({message: "Fullname, email, username and password are required fields"});
+            if (!(fullname && email && username && password && role)) {
+                return res.status(400).json({message: "Fullname, email, username, password and role are required fields"});
             }
 
             // Verificando se já há usuário com mesmo username
@@ -34,7 +34,7 @@ class CreateUserController {
                     email,
                     username,
                     password: hashedPass,
-                    role: 'auth'
+                    role
                 }
             });
 

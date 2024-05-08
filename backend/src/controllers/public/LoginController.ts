@@ -28,7 +28,7 @@ class LoginController {
                 { expiresIn: process.env.EXPIRES_IN }
             );
 
-            res.setHeader('Authorization', `Bearer ${token}`); // Adiciona token ao cabeçalho da resposta
+            res.setHeader('Authorization', token); // Adiciona token ao cabeçalho da resposta
 
             return res.status(200).json({
                 username,
