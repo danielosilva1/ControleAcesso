@@ -14,7 +14,7 @@ import { GetUserByUsernameController } from '../controllers/admin/GetUserByUsern
 const routes = Router();
 
 /* Rotas públicas (não requerem autorização) */
-routes.post('/sigin', new SignUpController().handle);
+routes.post('/sign-up', new SignUpController().handle);
 routes.post('/login', new LoginController().handle);
 
 routes.use(new AuthMiddleware().handle);

@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { Prisma } from '@prisma/client';
 import { db } from '../../db';
 import bcrypt from 'bcrypt';
 
@@ -9,18 +10,6 @@ class SignUpController {
 
             if (!(fullname && email && username && password)) {
                 return res.status(400).json({message: "Fullname, email, username and password are required fields"});
-            }
-
-            // Verificando se já há usuário com mesmo username
-            const userAlreadyExist = await db.user.findFirst({
-                where: { username: { equals: username,
-                                     mode: 'insensitive' // Busca no modo case-insensitive
-                    }
-                }
-            });
-
-            if (userAlreadyExist) {
-                return res.status(400).json({error: "User already exist"});
             }
 
             // Criptogra a senha do usuário usando hash code
@@ -40,6 +29,17 @@ class SignUpController {
 
             return res.status(201).json({ user });
         } catch (error) {
+            /* Erros do Prisma que podem ocorrer:
+               1. Restrição de chave única no username; ou
+               2. Restrição de chave única no email.
+            */
+            if (error instanceof Prisma.PrismaClientKnownRequestError) {
+                if (error.code === 'P2002') {
+                    // "P2002: Unique constraint failed on the {constraint}"
+                    return res.status(400).json({error: "Already exists user with same username or email"});
+                }
+            }
+
             console.error(error);
             throw(error);
         }
