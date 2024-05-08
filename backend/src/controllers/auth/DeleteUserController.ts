@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { db } from '../../db';
+import { Prisma } from '@prisma/client';
 
 /* Deleção pode ser:
    1. Do usuário logado;
@@ -20,8 +21,15 @@ class DeleteUserController {
             });
             return res.status(200).json({user});
         } catch (error) {
-            // Usuário não foi encontrado com base no di
-            return res.status(400).json({message: "User not found"});
+            /* Erro Prisma que pode ocorrer:
+               1. Usuário a ser deletado não foi encontrado com base no di
+            */
+            if (error instanceof Prisma.PrismaClientKnownRequestError) {
+                if (error.code === 'P2025') {
+                    // P2025: An operation failed because it depends on one or more records that were required but not found. {cause}
+                    return res.status(400).json({message: "User not found"});
+                }
+            }
         }
     }
 }
