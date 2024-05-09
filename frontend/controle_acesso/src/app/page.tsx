@@ -1,5 +1,7 @@
+import SignIn from "./(public)/SignIn/page";
+
 export default function Home() {
   return (
-    <div>Server is running...</div>
+    <SignIn></SignIn>
   );
 }
