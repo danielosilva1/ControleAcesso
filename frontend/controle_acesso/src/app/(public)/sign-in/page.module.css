@@ -67,6 +67,15 @@
     line-height: 5vh;
 }
 
+.signUpLbl {
+    width: 100%;
+    color: #fff;
+    font-size: 0.9em;
+    text-decoration: underline;
+    text-align: center;
+    margin-top: 1.5vh;
+}
+
 /* Efeitos do botão */
 .button:active {
     transform: translateY(2px); 

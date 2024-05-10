@@ -1,22 +1,69 @@
-'use client';
+"use client";
 import { useState } from "react";
 import styles from "./page.module.css";
+import { axios } from "@/config/axios";
+import { AxiosError } from "axios";
+import Swal from "sweetalert2";
+import Link from "next/link";
+import {useRouter } from "next/navigation";
 
 interface FormLogin {
     username: string,
     password: string
 }
 
-export default function SignIn() {
+// Interface para resposta da requisição de login
+interface Response {
+    id: string,
+    token: string
+}
 
+// Interface para erro: ajuda a recuperar mensagem retornada do back
+interface Error {
+    message: string
+}
+
+export default function SignIn() {
+    
     const [formLogin, setFormLogin] = useState<FormLogin>({
         username: "",
         password: ""
     });
 
+    const formLoginIsValid = () => {
+        return (formLogin.username != '' && formLogin.password != '')
+    }
+
+    const router = useRouter();
+
     /* Trata clique no botão Entrar: realiza o login */
     const handleLogin = () => {
-        console.log('Dados de Login\nUsername: ' + formLogin.username + '\nPassword: ' + formLogin.password);
+        if (!formLoginIsValid()) {
+            Swal.fire({
+                icon: 'warning',
+                text: 'Username and password are required fields'
+            });
+            return;
+        }
+
+        axios.post<Response>('/login', { username: formLogin.username, password: formLogin.password }).
+        then(response => {
+            if (response.status == 200) {
+                const token = response.data.token;
+
+                // Login efetuado com sucesso: adiciona token retornado ao header do axios
+                axios.defaults.headers['Authorization'] = `Bearer ${token}`;
+                
+                router.push('/home'); // Redireciona para tela inicial
+            }
+        }).catch((error: AxiosError<Error>) => {
+            const message = error.response?.data?.message;
+            axios.defaults.headers['Authorization'] = ''; // Remove token do header do axios
+            Swal.fire({
+                icon: 'error',
+                text: message
+            });
+        });
     }
 
     /* Trata evento change nas caixas de entrada: ajusta dados do formLogin */
@@ -96,6 +143,7 @@ export default function SignIn() {
                             >
                             <p className={styles.buttonLbl}>Entrar</p>
                         </div>
+                        <Link href='/home'><p className={styles.signUpLbl}>Não possui uma conta? Cadastre-se</p></Link>
                     </div>
                 </div>
             </div>

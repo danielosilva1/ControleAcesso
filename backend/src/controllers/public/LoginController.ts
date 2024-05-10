@@ -9,7 +9,7 @@ class LoginController {
         let { username, password } = req.body;
 
         if (!(username && password)) {
-            return res.status(400).json({error: 'Username and password are required fields'});
+            return res.status(400).json({message: 'Username and password are required fields'});
         }
 
         // Buscando dados do usuário pelo username informado
@@ -36,7 +36,7 @@ class LoginController {
             });
         };
 
-        return res.status(400).json({error: 'Username and/or password invalid'})
+        return res.status(400).json({message: 'Username and/or password invalid'})
     }
 }
 

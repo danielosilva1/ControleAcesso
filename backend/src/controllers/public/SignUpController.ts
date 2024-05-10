@@ -36,7 +36,7 @@ class SignUpController {
             if (error instanceof Prisma.PrismaClientKnownRequestError) {
                 if (error.code === 'P2002') {
                     // "P2002: Unique constraint failed on the {constraint}"
-                    return res.status(400).json({error: "Already exists user with same username or email"});
+                    return res.status(400).json({message: "Already exists user with same username or email"});
                 }
             }
 

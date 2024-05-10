@@ -5,11 +5,18 @@ import { routes } from './routes';
 import { config, responseObject } from './config/acl';
 
 const app = express();
+const cors = require('cors');
+
+const corsOption = {
+    credentials: true,
+    origin: 'http://localhost:3000'
+}
 
 // middlewares
 app.use(express.json());
 
 // routes
+app.use(cors(corsOption));
 app.use(routes);
 acl.config(config, responseObject);
 
