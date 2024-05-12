@@ -1,0 +1,47 @@
+.mainContainer {
+    background-color: rgba(25, 20, 39, 1);
+    padding-left: 1vw;
+    padding-right: 1vw;
+    border-radius: 0 0 5% 5%;
+}
+
+.toggleSidebarIcon {
+    font-size: 1.5em;
+    cursor: pointer;
+    color: white;
+    margin-bottom: 1.5vh;
+}
+
+.clickableSidebarItem {
+    cursor: pointer;
+    display: flex;
+}
+
+.sidebarItem {
+    padding: 2%;
+    display: flex;
+    flex-direction: line;
+}
+
+.sidebarItemIcon {
+    font-size: 1.5em;
+    color: white;
+}
+
+.sidebarItemLbl {
+    color: white;
+    white-space: nowrap; /* Impede quebra de linha */
+}
+
+/* Eventos */
+.toggleSidebarIcon:hover {
+    color: rgba(19, 210, 61, 1);
+}
+
+.clickableSidebarItem:hover .sidebarItemIcon {
+    color: rgba(19, 210, 61, 1);
+}
+
+.clickableSidebarItem:hover .sidebarItemLbl {
+    color: rgba(19, 210, 61, 1);
+}

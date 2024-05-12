@@ -127,7 +127,7 @@ export default function SignIn() {
                         <input
                             id='password'
                             className={styles.input}
-                            type='text'
+                            type='password'
                             placeholder='Digite sua senha'
                             tabIndex={0}
                             onKeyUp={ handleKeyPress }

@@ -1,0 +1,65 @@
+.mainContainer {
+    display: grid;
+    grid-template-columns: 10% 80% 10%;
+    height: 8vh;
+    background-color: rgba(25, 20, 39, 1);
+}
+
+.iconContainer {
+    display: flex;
+    justify-content: center;
+}
+
+.headerIcon {
+    font-size: 1.5em;
+    cursor: pointer;
+    align-self: center;
+    color: white;
+}
+
+.dropDownMenu {
+    position: absolute;
+    display: flex;          
+    flex-direction: column;
+    top: 6vh;
+    right: 0;
+    margin-right: 2%;
+    padding: 2%;
+    border-radius: 10%;
+    background-color: rgba(25, 20, 39, 1);
+}
+
+.dropDownMenuItem {
+    display: flex;
+    flex-direction: line;
+    margin-bottom: 5%;
+}
+
+.clickableDropDownMenuItem {
+    display: flex;
+    cursor: pointer;
+}
+
+.dropDownMenuLbl {
+    font-size: 1.0em;
+    white-space: nowrap; /* Impede quebra de linha */
+    color: white;
+}
+
+.dropDownMenuIcon {
+    font-size: 1.2em;
+    color: white;
+}
+
+/* Efeitos */
+.headerIcon:hover {
+    color: rgba(19, 210, 61, 1);
+}
+
+.clickableDropDownMenuItem:hover .dropDownMenuIcon {
+    color: rgba(19, 210, 61, 1);
+}
+
+.clickableDropDownMenuItem:hover .dropDownMenuLbl {
+    color: rgba(19, 210, 61, 1);
+}
