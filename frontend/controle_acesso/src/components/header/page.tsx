@@ -3,18 +3,36 @@ import styles from "./page.module.css";
 import { IoMdHome } from "react-icons/io";
 import { FaUserCircle, FaUserEdit, FaSignOutAlt } from "react-icons/fa";
 import { useState } from "react";
+import { axios } from "@/config/axios";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
     const [menuOpen, setMenuOpen] = useState(false);
+    const router = useRouter();
 
     const handleToggleMenu = () => {
         setMenuOpen(!menuOpen);
     }
 
+    const handleSignout = () => {
+        axios.defaults.headers['Authorization'] = ''; // Remove token do header do axios
+        router.push('./sign-in');
+    }
+
+    const handleGoToHomeWin = () => {
+        setMenuOpen(false); // Fecha menu drop-down
+        router.push('/home');
+    }
+
+    const handleGoToUpdProfileWin = () => {
+        handleToggleMenu(); // Altera visualização do menu drop-down
+        router.push('/update-profile');
+    }
+
     return (
         <div className={styles.mainContainer}>
              <div className={styles.iconContainer}>
-                <IoMdHome className={styles.headerIcon}></IoMdHome>
+                <IoMdHome className={styles.headerIcon} onClick={handleGoToHomeWin}></IoMdHome>
             </div>
             <div></div> {/* div central */}
             <div className={styles.iconContainer}>
@@ -24,13 +42,13 @@ export default function Header() {
             {menuOpen && (
                 <div className={styles.dropDownMenu}>
                     <div className={styles.dropDownMenuItem}>
-                        <div className={styles.clickableDropDownMenuItem}>
+                        <div className={styles.clickableDropDownMenuItem} onClick={handleGoToUpdProfileWin}>
                             <FaUserEdit className={styles.dropDownMenuIcon}></FaUserEdit>
                             <p className={styles.dropDownMenuLbl}>Editar perfil</p>
                         </div>
                     </div>
                     <div className={styles.dropDownMenuItem}>
-                        <div className={styles.clickableDropDownMenuItem}>
+                        <div className={styles.clickableDropDownMenuItem} onClick={handleSignout}>
                             <FaSignOutAlt className={styles.dropDownMenuIcon}></FaSignOutAlt>
                             <p className={styles.dropDownMenuLbl}>Sair</p>
                         </div>
