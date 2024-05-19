@@ -2,7 +2,7 @@
 import styles from "./page.module.css";
 import { IoMdHome } from "react-icons/io";
 import { FaUserCircle, FaUserEdit, FaSignOutAlt } from "react-icons/fa";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { axios } from "@/config/axios";
 import { useRouter } from "next/navigation";
 
@@ -28,6 +28,13 @@ export default function Header() {
         handleToggleMenu(); // Altera visualização do menu drop-down
         router.push('/update-profile');
     }
+
+    useEffect(() => {
+        if (axios.defaults.headers['Authorization'] == undefined || axios.defaults.headers['Authorization'] == '') {
+            // Usuário não está logado: redireciona para tela de login
+            router.push('/sign-in');
+        }
+    });
 
     return (
         <div className={styles.mainContainer}>
