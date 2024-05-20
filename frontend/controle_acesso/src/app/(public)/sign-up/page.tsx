@@ -1,26 +1,18 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styles from "./page.module.css";
 import Swal from "sweetalert2";
 import { axios } from "@/config/axios";
 import { AxiosError } from "axios";
+import { useRouter } from "next/navigation";
 
 interface FormUser {
     username: string,
     email: string,
     fullname: string,
-    password?: string,
-    passwordConfirm?: string
-}
-
-// Interface para resposta da requisição para obter dados do usuário logado
-interface Response {
-    user: {
-        username: string,
-        fullname: string,
-        email: string,
-    }
+    password: string,
+    passwordConfirm: string
 }
 
 // Interface para erro: ajuda a recuperar mensagem retornada do back
@@ -29,8 +21,7 @@ interface Error {
 }
 
 export default function updateProfile() {
-    const [changePass, setChangePass] = useState<boolean>(false);
-    const [loggedUser, setLoggedUser] = useState<FormUser>({
+    const [newUser, setNewUser] = useState<FormUser>({
         username: '',
         email: '',
         fullname: '',
@@ -38,26 +29,34 @@ export default function updateProfile() {
         passwordConfirm: ''
     });
     const [passAreEquals, setPassAreEquals] = useState<boolean>(true);
+    const router = useRouter();
 
     const formLoggedUserIsValid = () => {
-        return (loggedUser.email != ''
-                && loggedUser.fullname != ''
-                && (!changePass || (loggedUser.password != '' && loggedUser.passwordConfirm != ''))
-        );
+        return (newUser.username != ''
+                && newUser.email != ''
+                && newUser.fullname != ''
+                && newUser.password != ''
+                && newUser.passwordConfirm != ''
+                );
     }
 
-    const handleUpdateProfile = () => {
+    const handleSignUp = () => {
         if (formLoggedUserIsValid()) {
-            axios.put('/auth/update-user',
-            { email: loggedUser.email, fullname: loggedUser.fullname, ...(changePass && {password: loggedUser.password}) }).
-            then(response => {
-                if (response.status == 200) {
+            axios.post('/sign-up',
+            { username: newUser.username,
+              email: newUser.email,
+              fullname: newUser.fullname,
+              password: newUser.password
+            }
+            ).then(response => {
+                if (response.status == 201) {
                     Swal.fire({
                         icon: 'info',
-                        text: 'Profile updated successfully'
+                        text: 'User registered successfully'
                     }).then(value => {
                         if (value) {
-                            handleClearPassInput();
+                            // Redireciona para tela de login
+                            router.push('/sign-in');
                         }
                     });
                 }
@@ -76,51 +75,11 @@ export default function updateProfile() {
         }
     }
 
-    const handleGetLoggedUserData = () => {
-        axios.get<Response>('/auth/get-logged-user').
-        then(response => {
-            if (response.status == 200) {
-                const loggUser = response.data.user;
-
-                setLoggedUser({
-                    email: loggUser.email,
-                    username: loggUser.username,
-                    fullname: loggUser.fullname
-                });
-            }
-        }).catch((error: AxiosError<Error>) => {
-            const message = error.response?.data?.message;
-            Swal.fire({
-                icon: 'error',
-                text: message
-            });
-        });
-    }
-
-    useEffect(() => {
-        // Manda requisição para obter dados do usuário logado
-        handleGetLoggedUserData();
-    }, []);
-
-    const handleClearPassInput = () => {
-        let passComponent = document.getElementById('password') as HTMLInputElement;
-        let passConfirmComponent = document.getElementById('passwordConfirm') as HTMLInputElement;
-
-        if (passComponent && passConfirmComponent) {
-            passComponent.value = '';
-            passConfirmComponent.value = '';
-        }
-    }
-
-    const handleChangePass = () => {
-        setChangePass(!changePass);
-    }
-
     /* Trata evento change nas caixas de entrada: ajusta dados do formLogin */
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = e.target;
 
-        setLoggedUser(prevState => ({
+        setNewUser(prevState => ({
             ...prevState,
             [id]: value,
         }));
@@ -160,18 +119,21 @@ export default function updateProfile() {
 
         if (e.key === 'Enter') {
             // Tecla enter foi clicada: coloca foco na próxima caixa de texto
-            if (id == 'email') {
+            if (id == 'username') {
+                // Foco vai para caixa de email
+                component = document.getElementById('email');
+            } else if (id == 'email') {
                 // Foco vai para caixa de nome completo
                 component = document.getElementById('fullname');
             } else if (id == 'fullname') {
-                // Foco vai para checkbox de mudança de senha
-                component = document.getElementById('changePassword');
+                // Foco vai para checkbox de senha
+                component = document.getElementById('password');
             } else if (id == 'password') {
                 // Foco vai para caixa de confirmação da nova senha
                 component = document.getElementById('passwordConfirm');
             } else if (id == 'passwordConfirm') {
                 // Foco vai para botão de salvar alterações
-                component = document.getElementById('updateProfile');
+                component = document.getElementById('signup');
             }
             component?.focus();
         }
@@ -180,19 +142,20 @@ export default function updateProfile() {
     return (
         <div className={styles.mainContainer}>
             <div className={styles.updateProfileContainer}>
-                <p className={styles.pageTitle}>MEUS DADOS</p>
+                <p className={styles.pageTitle}>CADASTRE-SE</p>
                 <div className={styles.form}>
                     <div className={styles.horizontalEntryDataContainer}>
                         <div className={styles.entryDataContainerMinor}>
-                            <p className={styles.label}>Usuário</p>
+                            <p className={styles.label}>Usuário*</p>
                             <input
                                 id='username'
                                 className={styles.input}
                                 type='text'
                                 placeholder='Digite seu nome de usuário'
-                                value={loggedUser.username}
+                                value={newUser.username}
                                 tabIndex={0}
-                                readOnly={true}
+                                onKeyUp={handleKeyPress}
+                                onChange={handleInputChange}
                             ></input>
                         </div>
 
@@ -204,7 +167,7 @@ export default function updateProfile() {
                                 className={styles.input}
                                 type='email'
                                 placeholder='Digite seu email'
-                                value={loggedUser.email}
+                                value={newUser.email}
                                 tabIndex={0}
                                 onKeyUp={handleKeyPress}
                                 onChange={handleInputChange}
@@ -219,73 +182,55 @@ export default function updateProfile() {
                                 className={styles.input}
                                 type='text'
                                 placeholder='Digite seu nome completo'
-                                value={loggedUser.fullname}
+                                value={newUser.fullname}
                                 tabIndex={0}
                                 onKeyUp={handleKeyPress}
                                 onChange={handleInputChange}
                             ></input>
                         </div>
-                        <div className={styles.changePassChkBoxContainer}>
+                    </div>
+                    <div className={styles.horizontalEntryDataContainer}>
+                        <div className={styles.entryDataContainer}>
+                            <p className={styles.label}>Nova senha*</p>
                             <input
-                                id='changePassword'
-                                type='checkbox'
-                                onChange={handleChangePass}
+                                id='password'
+                                className={styles.input}
+                                type='password'
+                                placeholder='Digite sua nova senha'
+                                value={newUser.password}
                                 tabIndex={0}
-                            />
-                            <label htmlFor='changePassword' className={styles.label}>Alterar senha</label>
+                                onKeyUp={handleKeyPress}
+                                onChange={handleInputChange}
+                            ></input>
+                        </div>
+
+                        <div className={styles.entryDataContainer}>
+                            <p className={styles.label}>Confirmar senha*</p>
+                            <input
+                                id='passwordConfirm'
+                                className={styles.input}
+                                type='password'
+                                placeholder='Confirmar nova senha'
+                                tabIndex={0}
+                                onKeyUp={handleKeyPress}
+                                onChange={handleInputChange}
+                            ></input>
                         </div>
                     </div>
-                    { changePass && (
-                            <div className={styles.horizontalEntryDataContainer}>
-                            <div className={styles.entryDataContainer}>
-                                <p className={styles.label}>Nova senha*</p>
-                                <input
-                                    id='password'
-                                    className={styles.input}
-                                    type='password'
-                                    placeholder='Digite sua nova senha'
-                                    tabIndex={0}
-                                    onKeyUp={handleKeyPress}
-                                    onChange={handleInputChange}
-                                ></input>
-                            </div>
-
-                            <div className={styles.entryDataContainer}>
-                                <p className={styles.label}>Confirmar senha*</p>
-                                <input
-                                    id='passwordConfirm'
-                                    className={styles.input}
-                                    type='password'
-                                    placeholder='Confirmar nova senha'
-                                    tabIndex={0}
-                                    onKeyUp={handleKeyPress}
-                                    onChange={handleInputChange}
-                                ></input>
-                            </div>
-                        </div>
-                    )}
                     <div className={styles.entryDataContainer}>
-                        { (changePass && !passAreEquals) && (
+                        { !passAreEquals && (
                             <p className={styles.errorPassNotEqualsLbl}>As senhas não correspondem!</p>
                         )}
                     </div>
                     
                     <div className={styles.buttonContainer}>
-                        <div id='updateProfile'
+                        <div id='signup'
                                 className={styles.button}
                                 tabIndex={0}
-                                onClick={ (!changePass || passAreEquals) ? handleUpdateProfile : () => {} }
+                                onClick={passAreEquals ? handleSignUp : () => {} }
                                 onKeyUp={handleKeyPressBtn}
                             >
-                            <p className={styles.buttonLbl}>Salvar</p>
-                        </div>
-                        <div id='cancel'
-                                className={styles.buttonCancel}
-                                tabIndex={0}
-                                onClick={ (!changePass || passAreEquals) ? handleGetLoggedUserData : () => {} }
-                                onKeyUp={handleKeyPressBtn}
-                            >
-                            <p className={styles.buttonLbl}>Cancelar</p>
+                            <p className={styles.buttonLbl}>Cadastrar</p>
                         </div>
                     </div>
                 </div>

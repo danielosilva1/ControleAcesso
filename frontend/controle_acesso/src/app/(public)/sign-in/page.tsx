@@ -155,7 +155,7 @@ export default function SignIn() {
                             >
                             <p className={styles.buttonLbl}>Entrar</p>
                         </div>
-                        <Link href='/home'><p className={styles.signUpLbl}>Não possui uma conta? Cadastre-se</p></Link>
+                        <Link href='/sign-up'><p className={styles.signUpLbl}>Não possui uma conta? Cadastre-se</p></Link>
                     </div>
                 </div>
             </div>
