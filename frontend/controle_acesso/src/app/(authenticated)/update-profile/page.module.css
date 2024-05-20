@@ -66,6 +66,11 @@
     align-self: end;
 }
 
+.errorPassNotEqualsLbl {
+    color: white;
+    font-size: 1em;
+}
+
 .buttonContainer {
     display: flex;
     justify-content: center;

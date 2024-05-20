@@ -7,7 +7,7 @@ class AuthMiddleware {
         const token_ = req.headers['authorization'];
 
         if (!token_) {
-            return res.status(401).json({error: "Token not provided"});
+            return res.status(401).json({message: "Token not provided"});
         }
 
         const [, token] = token_.split(" ");
@@ -25,7 +25,7 @@ class AuthMiddleware {
 
             return next();
         } catch (error) {
-            return res.status(401).json({error: "Token invalid"});
+            return res.status(401).json({message: "Token invalid"});
         }
     }
 }

@@ -62,8 +62,20 @@ export default function SignIn() {
             Swal.fire({
                 icon: 'error',
                 text: message
-            });
+            }).then(value => {
+                if (value) {
+                    handleClearPassword();
+                }
+            })
         });
+    }
+
+    const handleClearPassword = () => {
+        let passComponent = document.getElementById('password') as HTMLInputElement;
+
+        if (passComponent) {
+            passComponent.value = '';
+        }
     }
 
     /* Trata evento change nas caixas de entrada: ajusta dados do formLogin */

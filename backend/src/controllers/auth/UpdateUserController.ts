@@ -13,8 +13,8 @@ class UpdateUserController {
             let id = req.params.id; // Id do usuário que será atualizado
             let { fullname, email, password, role } = req.body;
 
-            if (!(fullname && email && role)) {
-                return res.status(400).json({message: "Fullname, email and role are required fields"});
+            if (!(fullname && email)) {
+                return res.status(400).json({message: "Fullname and email are required fields"});
             }
 
             if (!id) {
@@ -50,7 +50,7 @@ class UpdateUserController {
                     fullname,
                     email,
                     password: password == undefined ? user.password : hashedPass,
-                    role
+                    role: role == undefined ? user.role : role
                 }
             });
 

@@ -34,7 +34,7 @@ export default function Header() {
             // Usuário não está logado: redireciona para tela de login
             router.push('/sign-in');
         }
-    });
+    }, []);
 
     return (
         <div className={styles.mainContainer}>
