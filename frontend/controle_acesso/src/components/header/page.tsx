@@ -5,6 +5,7 @@ import { FaUserCircle, FaUserEdit, FaSignOutAlt } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { axios } from "@/config/axios";
 import { useRouter } from "next/navigation";
+import { removeStoredItem } from "@/config/localStorage";
 
 export default function Header() {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -16,6 +17,7 @@ export default function Header() {
 
     const handleSignout = () => {
         axios.defaults.headers['Authorization'] = ''; // Remove token do header do axios
+        removeStoredItem('role'); // Remove role do armazenamento local
         router.push('./sign-in');
     }
 

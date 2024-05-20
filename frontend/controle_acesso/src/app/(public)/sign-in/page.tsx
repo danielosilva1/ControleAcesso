@@ -6,6 +6,7 @@ import { AxiosError } from "axios";
 import Swal from "sweetalert2";
 import Link from "next/link";
 import {useRouter } from "next/navigation";
+import { removeStoredItem, setStoredItem } from "@/config/localStorage";
 
 interface FormLogin {
     username: string,
@@ -14,7 +15,8 @@ interface FormLogin {
 
 // Interface para resposta da requisição de login
 interface Response {
-    id: string,
+    username: string,
+    role: string,
     token: string
 }
 
@@ -50,15 +52,21 @@ export default function SignIn() {
         then(response => {
             if (response.status == 200) {
                 const token = response.data.token;
+                const role = response.data.role;
 
                 // Login efetuado com sucesso: adiciona token retornado ao header do axios
                 axios.defaults.headers['Authorization'] = `Bearer ${token}`;
+
+                // Adiciona a role do usuário ao armazenamento local: útil para carregar as permissões do front na tela inicial
+                setStoredItem('role', role);
                 
                 router.push('/home'); // Redireciona para tela inicial
             }
         }).catch((error: AxiosError<Error>) => {
             const message = error.response?.data?.message;
             axios.defaults.headers['Authorization'] = ''; // Remove token do header do axios
+            removeStoredItem('role'); // Remove role do armazenamento local
+            // Adiciona a role do usuário ao armazenamento local: útil para carregar as permissões do front na tela inicial
             Swal.fire({
                 icon: 'error',
                 text: message
