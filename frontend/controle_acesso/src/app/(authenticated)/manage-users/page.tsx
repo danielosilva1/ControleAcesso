@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./page.module.css";
 import Swal from "sweetalert2";
 import { axios } from "@/config/axios";
@@ -28,6 +28,11 @@ interface UserInfo {
     role: string
 }
 
+// Interface de retorno da requisição que obtém todos os usuários
+interface Users {
+    users: UserInfo[]
+}
+
 // Interface para erro: ajuda a recuperar mensagem retornada do back
 interface Error {
     message: string
@@ -47,9 +52,7 @@ export default function ManageUsers() {
     const [isAdmin, setIsAdmin] = useState<boolean>(false);
     const [changePass, setChangePass] = useState<boolean>(false);
     const [users, setUsers] = useState<UserInfo[]>([
-        { id: '1', username: 'Usuário1', email: 'usuario1@gmail.com', fullname: 'Nome completo do usuário 1', role: 'admin' },
-        { id: '2', username: 'Usuário2', email: 'usuario2@gmail.com', fullname: 'Nome completo do usuário 2', role: 'auth' },
-        { id: '3', username: 'Usuário3', email: 'usuario3@gmail.com', fullname: 'Nome completo do usuário 3', role: 'auth' }
+        { id: '', username: '', email: '', fullname: '', role: '' },
     ]);
     const [selectedUser, setSelectedUser] = useState<UserInfo>(
         { id: '', username: '', email: '', fullname: '', role: '' }
@@ -61,7 +64,6 @@ export default function ManageUsers() {
                     && user.email != ''
                     && user.fullname != ''
                     && user.password != ''
-                    && user.passwordConfirm != ''
                     );
         }
 
@@ -69,22 +71,32 @@ export default function ManageUsers() {
                 && selectedUser.email != ''
                 && selectedUser.fullname != ''
                 && ( !changePass ||
-                    ( selectedUser.password != '' && selectedUser.passwordConfirm != '' ) )
+                    ( selectedUser.password != undefined && selectedUser.password != '') )
                 );
-
     }
+
+    const handleGetAllUsers = () => {
+        axios.get<Users>('/admin/get-users').
+        then(response => {
+            if (response.status == 200) {
+                setUsers(response.data.users);
+            }
+        }).catch((error: AxiosError<Error>) => {
+            const message = error.response?.data?.message;
+            Swal.fire({
+                icon: 'error',
+                text: message
+            });
+        });
+    }
+
+    useEffect(() => {
+        // Busca todos os usuários cadastrados
+        handleGetAllUsers();
+    }, []);
 
     const handleRegisterUser = () => {
         if (formUserDataIsValid()) {
-
-            Swal.fire({
-                text: `Cadastrar usuário. Dados: username: ${user.username}, email: ${user.email}, fullname: ${user.fullname}, password: ${user.password}, role: ${isAdmin ? 'admin' : 'auth'}`
-            });
-
-            return;
-
-
-
             axios.post('/admin/create-user',
             {
                 username: user.username,
@@ -101,6 +113,9 @@ export default function ManageUsers() {
                     }).then(value => {
                         handleClearAllInputs();
                     });
+
+                    // Obtém usuários cadastrados - atualiza a lista de seleção da tela de edição
+                    handleGetAllUsers();
                 }
             }).catch((error: AxiosError<Error>) => {
                 const message = error.response?.data?.message;
@@ -118,10 +133,28 @@ export default function ManageUsers() {
     }
 
     const handleUpdateUser = () => {
+        const body = {
+            email: selectedUser.email
+            , fullname: selectedUser.fullname,
+            ...(changePass && { password: selectedUser.password }),
+            role: isAdmin ? 'admin' : 'auth'
+        }
+
         if (formUserDataIsValid()) {
-            Swal.fire({
-                text: `Atualizar dados do usuário cujo id é ${selectedUser?.id}.
-                Novos dados: username: ${selectedUser.username}, email: ${selectedUser.email}, fullname: ${selectedUser.fullname}, password: ${selectedUser.password}, role: ${isAdmin ? 'admin' : 'auth'}`
+            axios.put(`/admin/update-user/${selectedUser?.id}` , body).
+            then(response => {
+                if (response.status == 200) {
+                    Swal.fire({
+                        icon: 'info',
+                        text: 'User updated successfully'
+                    });
+                }
+            }).catch((error: AxiosError<Error>) => {
+                const message = error.response?.data?.message;
+                Swal.fire({
+                    icon: 'error',
+                    text: message
+                });
             });
         } else {
             Swal.fire({
@@ -133,7 +166,36 @@ export default function ManageUsers() {
 
     const handleDeleteUserById = () => {
         Swal.fire({
-            text: `Deletar dados do usuário cujo id é ${selectedUser?.id}`
+            icon: 'warning',
+            text: `Deletar dados do usuário cujo id é ${selectedUser?.id}?`,
+            showCancelButton: true
+        }).then(result => {
+            if (result.value) {
+                axios.delete(`/admin/delete-user/${selectedUser?.id}`).
+                then(response => {
+                    if (response.status == 200) {
+                        Swal.fire({
+                            icon: 'info',
+                            text: 'User deleted successfully'
+                        }).then(value => {
+                            if (value) {
+                                handleClearAllInputs();
+                            }
+                        });
+
+                        // Remove o item da lista de usuários - remove o usuário da lista de seleção
+                        setUsers(
+                            users.filter((item) => item.id != selectedUser?.id)
+                        );
+                    }
+                }).catch((error: AxiosError<Error>) => {
+                    const message = error.response?.data?.message;
+                    Swal.fire({
+                        icon: 'error',
+                        text: message
+                    });
+                });
+            }
         });
     }
 
@@ -154,6 +216,7 @@ export default function ManageUsers() {
         
         setIsAdmin(false);
         setChangePass(false);
+        setPassAreEquals(true);
     }
 
     const handleChangeIsAdmin = () => {
@@ -276,6 +339,7 @@ export default function ManageUsers() {
                                     }))
                                     : []
                                 }
+                                
                                 className={styles.reactSelect}
                                 isSearchable
                                 placeholder='Selecione um usuário'
@@ -390,8 +454,9 @@ export default function ManageUsers() {
                             </div>
                         </>
                     )}
-                    
+         
                     <div className={styles.buttonContainer}>
+                        { (showRegisterForm || (!showRegisterForm && selectedUser?.id != '')) && (
                         <div id='register'
                                 className={styles.button}
                                 tabIndex={0}
@@ -400,20 +465,10 @@ export default function ManageUsers() {
                             >
                             <p className={styles.buttonLbl}> {showRegisterForm ? 'Cadastrar' : 'Salvar'} </p>
                         </div>
+                        )}
 
-                        { (!showRegisterForm && selectedUser.id != '') && (
-                            <>
-                            {/* Botão de cancelar alterações */}
-                            <div id='cancel'
-                                    className={styles.buttonCancel}
-                                    tabIndex={0}
-                                    // onClick={handleGetUserById}
-                                    onKeyUp={handleKeyPressBtn}
-                                >
-                                <p className={styles.buttonLbl}>Cancelar</p>
-                            </div>
-
-                            {/* Botão de excluir usuário */}
+                        { (!showRegisterForm && selectedUser.id != '') && (   
+                            /* Botão de excluir usuário */
                             <div id='delete'
                                     className={styles.buttonDelete}
                                     tabIndex={0}
@@ -422,7 +477,6 @@ export default function ManageUsers() {
                                 >
                                 <p className={styles.buttonLbl}>Excluir</p>
                             </div>
-                            </>
                         )}
                     </div>
                 </div>

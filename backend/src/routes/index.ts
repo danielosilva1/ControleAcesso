@@ -10,6 +10,7 @@ import { UpdateUserController } from '../controllers/auth/UpdateUserController';
 import { CreateUserController } from '../controllers/admin/CreateUserController';
 import { GetUserByIdController } from '../controllers/admin/GetUserByIdController';
 import { GetUserByUsernameController } from '../controllers/admin/GetUserByUsernameController';
+import { GetAllUsersController } from '../controllers/admin/GetAllUsersController';
 
 const routes = Router();
 
@@ -32,5 +33,6 @@ routes.get('/admin/get-user-by-id/:id', new GetUserByIdController().handle);
 routes.get('/admin/get-user-by-username/:username', new GetUserByUsernameController().handle);
 routes.put('/admin/update-user/:id?', new UpdateUserController().handle);
 routes.delete('/admin/delete-user/:id?', new DeleteUserController().handle);
+routes.get('/admin/get-users', new GetAllUsersController().handle);
 
 export { routes };
