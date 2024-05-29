@@ -15,8 +15,39 @@
 
 
 ## Stack de desenvolvimento
+### Para o backend:
 <ol>
-    <li>Node.js, para o backend;</li>
+    <li>Node.js;</li>
     <li>Postgres, para a persistência de dados;</li>
     <li>Postman, para o teste das rotas.</li>
 </ol>
+
+### Para o frontend:
+<ol>
+    <li>React.js;</li>
+    <li>Nest.js;</li>
+    <li>Typescript.</li>
+</ol>
+
+## Atualizações Futuras
+<ul>
+    <li>Melhorar responsividade do site (algumas telas não apresentam visualização adequada em dispositivos menores);</li>
+    <li>Permitir que usuário altere idioma do site pelo menos entre português e inglês (atualmente as mensagens retornadas pelo backend estão em inglês e o frontend está em português);</li>
+    <li>Integrar sistema de login com autenticação pelo google ou facebook, por exemplo.</li>
+</ul>
+
+## Resultado Final - Overview
+✔️ Login
+<img src='presentation/sign-in.png' />
+
+✔️ Home (administrador)
+<img src='presentation/home-admin.png'/>
+
+✔️ Atualização do perfil do usuário logado
+<img src='presentation/update-profile.png'/>
+
+✔️ Gerenciamento de usuários - cadastro (administrador)
+<img src='presentation/manage-users-create-admin.png'/>
+
+✔️ Gerenciamento de usuários - atualização/deleção (administrador)
+<img src='presentation/manage-users-upd-del-admin.png'/>
